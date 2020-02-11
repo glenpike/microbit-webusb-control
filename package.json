@@ -1,0 +1,30 @@
+{
+  "name": "starter",
+  "version": "0.0.1",
+  "main": "src/index.js",
+  "scripts": {
+    "watch": "watchify src/*.js -o dist/bundle.js  -dv",
+    "serve": "http-server dist/",
+    "livereload": "livereload dist/",
+    "dev": "npm run serve & npm run livereload & npm run watch",
+    "lint": "eslint src"
+  },
+  "keywords": [],
+  "author": "cerebral@glenpike.co.uk",
+  "license": "MIT",
+  "engines": {
+    "node": ">=4.2.1"
+  },
+  "devDependencies": {
+    "browserify": "^13.1.0",
+    "eslint": "^4.13.1",
+    "eslint-plugin-prettier": "^2.4.0",
+    "http-server": "^0.10.0",
+    "livereload": "^0.9.1",
+    "prettier": "^1.19.1",
+    "watchify": "^3.11.1"
+  },
+  "dependencies": {
+    "tone": "^0.12.80"
+  }
+}
