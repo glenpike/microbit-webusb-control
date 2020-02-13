@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "main": "src/index.js",
   "scripts": {
-    "watch": "watchify src/*.js -o dist/bundle.js  -dv",
+    "watch": "watchify src/*.js -o dist/bundle.js  -dv -t [ babelify ]",
     "serve": "http-server dist/",
     "livereload": "livereload dist/",
     "dev": "npm run serve & npm run livereload & npm run watch",
@@ -16,6 +16,11 @@
     "node": ">=4.2.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.8.4",
+    "@babel/plugin-transform-async-to-generator": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.8.3",
+    "@babel/preset-env": "^7.8.4",
+    "babelify": "^10.0.0",
     "browserify": "^13.1.0",
     "eslint": "^4.13.1",
     "eslint-plugin-prettier": "^2.4.0",
@@ -25,6 +30,7 @@
     "watchify": "^3.11.1"
   },
   "dependencies": {
+    "@babel/runtime": "^7.8.4",
     "tone": "^0.12.80"
   }
 }
