@@ -24,7 +24,7 @@
     "browserify": "^13.1.0",
     "eslint": "^4.13.1",
     "eslint-plugin-prettier": "^2.4.0",
-    "http-server": "^0.10.0",
+    "http-server": "^0.12.1",
     "livereload": "^0.9.1",
     "prettier": "^1.19.1",
     "watchify": "^3.11.1"
