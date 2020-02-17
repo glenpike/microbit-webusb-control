@@ -1,3 +1,9 @@
+const interfaceNumber = 4;
+const controlTransferGetReport = 0x01;
+const controlTransferSetReport = 0x09;
+const controlTransferOutReport = 0x200;
+const controlTransferInReport = 0x100;
+
 class USBDevices {
   constructor() {
     navigator.usb.addEventListener('connect', (event) => {
@@ -23,34 +29,56 @@ class USBDevices {
       await device.selectConfiguration(1)
     await device.claimInterface(4)
     console.log('Connected ', device)
-
     //TODO: Set baud rate
     //https://github.com/microsoft/pxt-microbit/blob/afd1b07fd02df6b8316ca240c7c7a41115eae8de/editor/extension.tsx#L130
+    await this.sendPacketAsync(device, Uint8Array.from([0x82, 0x00, 0xC2, 0x01, 0x00]))
+    const buf = await this.receivePacketAsync(device)
+    console.log('Connect Received: ' + buf)
   }
   //TODO sendPacketAsync:
   //https://github.com/microsoft/pxt/blob/master/pxtlib/webusb.ts#L186
+  async sendPacketAsync(device, packet) {
+    return device.controlTransferOut({
+        requestType: "class",
+        recipient: "interface",
+        request: controlTransferSetReport,
+        value: controlTransferOutReport,
+        index: interfaceNumber
+    }, packet).then(res => {
+        if (res.status != "ok")
+          console.error("USB CTRL OUT transfer failed")
+        console.log(`USB CTRL OUT sent: ${res.bytesWritten} bytes`)
+    })
+  }
 
   //TODO reading Serial
   //https://github.com/microsoft/pxt-microbit/blob/afd1b07fd02df6b8316ca240c7c7a41115eae8de/editor/extension.tsx#L52
+  async readSerial(device) {
+    await this.sendPacketAsync(device, Uint8Array.from([0x83]))
+    const data = await this.receivePacketAsync(device)
+    return data.slice(2)
+  }
+  
   async receivePacketAsync(device) {
     console.log('receivePacketAsync ', device)
     let final = (res) => {
       console.log('final ', res)
       if (res.status != "ok")
-        this.error("USB IN transfer failed")
+        console.error("USB IN transfer failed")
       let arr = new Uint8Array(res.data.buffer)
       if (arr.length == 0) {
           console.log('array length is 0')
           return this.recvPacketAsync(device)
       }
+      console.log('final Received: ' + arr)
       return arr
     }
     return device.controlTransferIn({
       requestType: "class",
       recipient: "interface",
-      request: 0x01,
-      value: 0x100,
-      index: 4
+      request: controlTransferGetReport,
+      value: controlTransferInReport,
+      index: interfaceNumber
     }, 64).then(final)
   }
 
