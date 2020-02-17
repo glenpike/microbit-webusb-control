@@ -20,23 +20,24 @@ class USBDevices {
       this.devices = devices;
       devices.forEach((device) => this.connectDevice(device))
     })
-
   }
 
   async connectDevice(device) {
-    await device.open()
-    if (device.configuration === null)
-      await device.selectConfiguration(1)
-    await device.claimInterface(4)
-    console.log('Connected ', device)
-    //TODO: Set baud rate
-    //https://github.com/microsoft/pxt-microbit/blob/afd1b07fd02df6b8316ca240c7c7a41115eae8de/editor/extension.tsx#L130
-    await this.sendPacketAsync(device, Uint8Array.from([0x82, 0x00, 0xC2, 0x01, 0x00]))
-    const buf = await this.receivePacketAsync(device)
-    console.log('Connect Received: ' + buf)
+    try {
+      await device.open()
+      if (device.configuration === null)
+        await device.selectConfiguration(1)
+      await device.claimInterface(4)
+      console.log('Connected ', device)
+      //Set baud rate
+      await this.sendPacketAsync(device, Uint8Array.from([0x82, 0x00, 0xC2, 0x01, 0x00]))
+      const buf = await this.receivePacketAsync(device)
+    } catch(e) {
+      console.warn('could not connect device: ', device);
+    }
   }
-  //TODO sendPacketAsync:
-  //https://github.com/microsoft/pxt/blob/master/pxtlib/webusb.ts#L186
+
+  //From: https://github.com/microsoft/pxt/blob/master/pxtlib/webusb.ts#L186
   async sendPacketAsync(device, packet) {
     return device.controlTransferOut({
         requestType: "class",
@@ -51,18 +52,18 @@ class USBDevices {
     })
   }
 
-  //TODO reading Serial
-  //https://github.com/microsoft/pxt-microbit/blob/afd1b07fd02df6b8316ca240c7c7a41115eae8de/editor/extension.tsx#L52
+  //From https://github.com/microsoft/pxt-microbit/blob/afd1b07fd02df6b8316ca240c7c7a41115eae8de/editor/extension.tsx#L52
   async readSerial(device) {
     await this.sendPacketAsync(device, Uint8Array.from([0x83]))
     const data = await this.receivePacketAsync(device)
+    // First 2 bytes mean something, but we don't know what. Think [0] is an echo of the command, e.g. 0x83 and wondering if second maybe a CRC showing odd/even?
     return data.slice(2)
   }
-  
+
   async receivePacketAsync(device) {
-    console.log('receivePacketAsync ', device)
+    // console.log('receivePacketAsync ', device)
     let final = (res) => {
-      console.log('final ', res)
+      // console.log('final ', res)
       if (res.status != "ok")
         console.error("USB IN transfer failed")
       let arr = new Uint8Array(res.data.buffer)
@@ -70,7 +71,7 @@ class USBDevices {
           console.log('array length is 0')
           return this.recvPacketAsync(device)
       }
-      console.log('final Received: ' + arr)
+      // console.log('final Received: ' + arr)
       return arr
     }
     return device.controlTransferIn({
