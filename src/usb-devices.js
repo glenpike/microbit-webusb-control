@@ -4,6 +4,8 @@ const controlTransferSetReport = 0x09;
 const controlTransferOutReport = 0x200;
 const controlTransferInReport = 0x100;
 
+async function delay(ms) { new Promise(resolve => setTimeout(resolve, ms) ) }
+
 class USBDevices {
   constructor() {
     navigator.usb.addEventListener('connect', (event) => {
@@ -37,6 +39,15 @@ class USBDevices {
     }
   }
 
+  async disconnectDevice(device) {
+    try {
+      await device.releaseInterface(4)
+      console.log('disconnected ', device)
+    } catch(e) {
+      console.warn('could not disconnect device: ', device);
+    }
+  }
+
   //From: https://github.com/microsoft/pxt/blob/master/pxtlib/webusb.ts#L186
   async sendPacketAsync(device, packet) {
     return device.controlTransferOut({
@@ -46,18 +57,17 @@ class USBDevices {
         value: controlTransferOutReport,
         index: interfaceNumber
     }, packet).then(res => {
-        if (res.status != "ok")
+        if (res.status != "ok") {
           console.error("USB CTRL OUT transfer failed")
-        console.log(`USB CTRL OUT sent: ${res.bytesWritten} bytes`)
+        }
+        // console.log(`USB CTRL OUT sent: ${res.bytesWritten} bytes`)
     })
   }
 
   //From https://github.com/microsoft/pxt-microbit/blob/afd1b07fd02df6b8316ca240c7c7a41115eae8de/editor/extension.tsx#L52
   async readSerial(device) {
     await this.sendPacketAsync(device, Uint8Array.from([0x83]))
-    const data = await this.receivePacketAsync(device)
-    // First 2 bytes mean something, but we don't know what. Think [0] is an echo of the command, e.g. 0x83 and wondering if second maybe a CRC showing odd/even?
-    return data.slice(2)
+    await this.receivePacketAsync(device)
   }
 
   async receivePacketAsync(device) {
@@ -69,9 +79,20 @@ class USBDevices {
       let arr = new Uint8Array(res.data.buffer)
       if (arr.length == 0) {
           console.log('array length is 0')
-          return this.recvPacketAsync(device)
+          return this.receivePacketAsync(device)
       }
-      // console.log('final Received: ' + arr)
+      var len = arr[1];
+      var str = "";
+      for (var i = 2; i < len + 2; ++i) {
+          str += String.fromCharCode(arr[i]);
+      }
+      if (str.length > 0) {
+          window.postMessage({
+              type: 'serial',
+              id: 'n/a',
+              data: str
+          }, "*");
+      }
       return arr
     }
     return device.controlTransferIn({
