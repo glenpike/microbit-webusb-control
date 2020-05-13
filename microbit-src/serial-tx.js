@@ -35,11 +35,11 @@ function sendPacket(name: String, value: any) {
           radio.sendValue(`${name}`, value)
       }
   } else {
-      serial.writeLine(`{ "${name}": "${value}" }`)
+      serial.writeLine(`{ "s": "1234", "t": "${input.runningTimeMicros()}", "n": "${name}", "v": "${value}" }`)
   }
 }
 basic.showLeds(`
-. . # . .
+# . # . #
 . # # # .
 # . # . #
 . . # . .

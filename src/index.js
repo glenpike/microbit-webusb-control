@@ -1,9 +1,12 @@
-// const Tone = require('tone')
+const Tone = require('tone')
 
-// window.Tone = Tone
+window.Tone = Tone
 
 import MicrobitUSB from './microbit-usb'
 import USBDeviceManager from './usb-device-manager'
+
+//create a synth and connect it to the master output (your speakers)
+let synth = new Tone.Synth().toMaster()
 
 const deviceManager = new USBDeviceManager(MicrobitUSB);
 
@@ -11,6 +14,7 @@ let running = false
 
 async function delay(ms) { new Promise(resolve => setTimeout(resolve, ms) ) }
 
+// Move this, either to Microbit or 'middleware' kind of thing
 let serialText = ''
 function processSerialInput(serialData) {
   let lines = []
@@ -48,17 +52,36 @@ function processDataPackets(lines) {
   return packets;
 }
 
+let notes_1 = [36, 40, 43, 48, 52, 55, 60, 64, 67] // C E G arpeggios
+let notes_2 = [36, 38, 40, 41, 43, 45, 47, 48] //.map { |n| n + 24 }
+
+const mapNotes = (value, notes) => {
+  let input = Math.max(value, 0)
+  input = Math.min(input, 100)
+  let index = Math.floor(((input / 101) * notes.length))
+  return notes[index]
+}
+
 function serialEventHandler(data) {
   let lines = processSerialInput(data)
   let packets = processDataPackets(lines)
   if (packets.length) {
-    console.log('received some packets: ', packets)
+    for(let i = 0;i < packets.length;i++) {
+      if(packets[i].n == 'pitch') {
+        let note = mapNotes(packets[i].v, notes_1)
+        // console.log('received pitch: ', note)
+        synth.triggerAttackRelease(Tone.Frequency(note, "midi") , '8n')
+      }
+    }
   }
 }
 
 async function readUSBDevice() {
+  await Tone.start()
+  console.log('audio is ready')
+  
   const microbit = await deviceManager.addDevice();
-
+  
   if(!microbit) {
     console.log('No microbit!')
     return;
@@ -69,7 +92,6 @@ async function readUSBDevice() {
   console.log('Starting!')
   running = true
   
-
   while(running) {
     await microbit.readSerial()
     await delay(50)
