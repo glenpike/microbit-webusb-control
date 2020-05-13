@@ -19,7 +19,7 @@ class MicrobitUSB {
         await this.device.selectConfiguration(1)
       }
       await this.device.claimInterface(interfaceNumber)
-      //Set baud rate
+      //Set baud rate - this is throwing an error sometimes:
       await this.sendPacketAsync(this.device, Uint8Array.from([0x82, 0x00, 0xC2, 0x01, 0x00]))
       const buf = await this.receivePacketAsync()
       console.log('MicrobitUSB connected ', this.device, buf)
@@ -39,6 +39,8 @@ class MicrobitUSB {
 
   //From: https://github.com/microsoft/pxt/blob/master/pxtlib/webusb.ts#L186
   async sendPacketAsync(packet) {
+    //Error when we try to set the baud:
+    //TypeError: Failed to execute 'controlTransferOut' on 'USBDevice': The provided value is not of type '(ArrayBuffer or ArrayBufferView)'
     return this.device.controlTransferOut({
         requestType: "class",
         recipient: "interface",
@@ -62,9 +64,6 @@ class MicrobitUSB {
   }
 
   async receivePacketAsync() {
-    // if(!this.device) {
-    //   return []
-    // }
     // console.log('receivePacketAsync ', this.device)
     let final = (res) => {
       // console.log('final ', res)
