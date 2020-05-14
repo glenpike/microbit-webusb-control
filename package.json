@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",
+    "babel-eslint": "^10.1.0",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-transform-async-to-generator": "^7.8.3",
     "@babel/plugin-transform-runtime": "^7.9.6",
@@ -32,7 +33,6 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.9.6",
-    "babel-eslint": "^10.1.0",
     "tone": "^13.8.25"
   }
 }
