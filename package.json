@@ -16,22 +16,22 @@
     "node": ">=4.2.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.8.4",
+    "@babel/core": "^7.9.6",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-transform-async-to-generator": "^7.8.3",
-    "@babel/plugin-transform-runtime": "^7.8.3",
-    "@babel/preset-env": "^7.8.4",
+    "@babel/plugin-transform-runtime": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
     "babelify": "^10.0.0",
     "browserify": "^13.1.0",
     "eslint": "^4.13.1",
     "eslint-plugin-prettier": "^2.4.0",
-    "http-server": "^0.12.1",
+    "http-server": "^0.12.3",
     "livereload": "^0.9.1",
     "prettier": "^1.19.1",
     "watchify": "^3.11.1"
   },
   "dependencies": {
-    "@babel/runtime": "^7.8.4",
+    "@babel/runtime": "^7.9.6",
     "tone": "^13.8.25"
   }
 }
