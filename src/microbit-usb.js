@@ -4,6 +4,8 @@ const controlTransferSetReport = 0x09;
 const controlTransferOutReport = 0x200;
 const controlTransferInReport = 0x100;
 
+async function delay(ms) { new Promise(resolve => setTimeout(resolve, ms) ) }
+
 class MicrobitUSB {
   static vendorId = 0x0D28
   static productId = 0x0204
@@ -19,8 +21,9 @@ class MicrobitUSB {
         await this.device.selectConfiguration(1)
       }
       await this.device.claimInterface(interfaceNumber)
+      await delay(1000)
       //Set baud rate - this is throwing an error sometimes:
-      await this.sendPacketAsync(this.device, Uint8Array.from([0x82, 0x00, 0xC2, 0x01, 0x00]))
+      await this.sendPacketAsync(Uint8Array.from([0x82, 0x00, 0xC2, 0x01, 0x00]))
       const buf = await this.receivePacketAsync()
       console.log('MicrobitUSB connected ', this.device, buf)
     } catch(e) {
