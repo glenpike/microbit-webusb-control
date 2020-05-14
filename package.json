@@ -10,10 +10,10 @@
     "lint": "eslint src"
   },
   "keywords": [],
-  "author": "cerebral@glenpike.co.uk",
+  "author": "github@glenpike.co.uk",
   "license": "MIT",
   "engines": {
-    "node": ">=4.2.1"
+    "node": ">=10.14.1"
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",

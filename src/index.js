@@ -5,12 +5,6 @@ window.Tone = Tone
 import MicrobitUSB from './microbit-usb'
 import USBDeviceManager from './usb-device-manager'
 
-// Fix the vulnerabilities
-// Do a separate synth - defs?
-// Mapping input to notes and controls
-// Create 'wiring' handler
-
-//create a synth and connect it to the master output (your speakers)
 let synth = new Tone.Synth().toMaster()
 
 const deviceManager = new USBDeviceManager(MicrobitUSB)
