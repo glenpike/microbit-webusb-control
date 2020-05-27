@@ -1,3 +1,5 @@
+let app
+
 const Tone = require('tone')
 
 window.Tone = Tone
@@ -108,6 +110,7 @@ const readUSBDevice = async () => {
 
   console.log('Starting!')
   running = true
+  app.$data.isRunning = true
 
   Tone.Transport.start()
   while (running) {
@@ -117,6 +120,7 @@ const readUSBDevice = async () => {
   console.log('Stopping!')
   microbit.disable()
   Tone.Transport.stop()
+  app.$data.isRunning = false
 }
 
 const disconnectListener = (data) => {
@@ -138,11 +142,19 @@ const messageHandler = (event) => {
 
 ;(async () => {
   window.addEventListener('message', messageHandler)
-  const go = document.querySelector('.js-button-go')
-  console.log('button ', go)
-  go.onclick = () => readUSBDevice()
-  const stop = document.querySelector('.js-button-stop')
-  stop.onclick = () => {
-    running = false
-  }
+
+  app = new Vue({
+    el: '.app',
+    data: {
+     isRunning: false
+    },
+    methods: {
+      go: () => {
+        readUSBDevice()
+      },
+      stop: () => {
+        running = false
+      }
+    }
+  })
 })()

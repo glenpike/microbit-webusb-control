@@ -5,9 +5,10 @@
 </head>
 <body>
 	<div class="app">
-    <button class="js-button-go">Go</button>
-    <button class="js-button-stop">Stop</button>
+    <button v-if="isRunning" v-on:click="stop">Stop</button>
+    <button v-else v-on:click="go">Go</button>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 	<script src="bundle.js"></script>
 </body>
 </html>
