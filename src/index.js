@@ -95,34 +95,6 @@ const serialEventHandler = (data) => {
   }
 }
 
-const readUSBDevice = async () => {
-  await Tone.start()
-  console.log('audio is ready')
-
-  const microbit = await deviceManager.addDevice()
-
-  if (!microbit) {
-    console.log('No microbit!')
-    return
-  }
-
-  await microbit.enable()
-
-  console.log('Starting!')
-  running = true
-  app.$data.isRunning = true
-
-  Tone.Transport.start()
-  while (running) {
-    await microbit.readSerial()
-    await delay(50)
-  }
-  console.log('Stopping!')
-  microbit.disable()
-  Tone.Transport.stop()
-  app.$data.isRunning = false
-}
-
 const disconnectListener = (data) => {
   console.log('microbit disconnected? ', data.device)
   running = false
@@ -149,11 +121,31 @@ const messageHandler = (event) => {
      isRunning: false
     },
     methods: {
-      go: () => {
-        readUSBDevice()
+      go: async function() {
+        await Tone.start()
+
+        const microbit = await deviceManager.addDevice()
+
+        if (!microbit) {
+          console.error('No microbit!')
+          return
+        }
+
+        await microbit.enable()
+
+        this.isRunning = true
+
+        Tone.Transport.start()
+        while (this.isRunning) {
+          await microbit.readSerial()
+          await delay(50)
+        }
+        console.log('Stopping!')
+        microbit.disable()
+        Tone.Transport.stop()
       },
-      stop: () => {
-        running = false
+      stop: function() {
+        this.isRunning = false
       }
     }
   })
