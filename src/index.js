@@ -112,6 +112,21 @@ const messageHandler = (event) => {
   }
 }
 
+Vue.component('grid-cell', {
+  data: {
+    isChecked: false,
+    isActive: false
+  },
+  template: '<input type="checkbox" v-model="isChecked">'
+})
+
+Vue.component('grid-row', {
+  data: {
+    columns: 8
+  },
+  template: '<ul><li v-for="n in 8"><grid-cell v-bind:id="n" isChecked="1"></grid-cell></li></ul>'
+})
+
 ;(async () => {
   window.addEventListener('message', messageHandler)
 

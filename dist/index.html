@@ -7,6 +7,10 @@
 	<div class="app">
     <button v-if="isRunning" v-on:click="stop">Stop</button>
     <button v-else v-on:click="go">Go</button>
+
+    <div class="grid">
+      <grid-row></grid-row>
+    </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 	<script src="bundle.js"></script>
